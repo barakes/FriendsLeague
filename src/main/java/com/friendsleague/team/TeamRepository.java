@@ -12,4 +12,6 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     Optional<Team> findByLeagueIdAndAccountId(Long leagueId, Long accountId);
 
     long countByLeagueId(Long leagueId);
+
+    boolean existsByLeagueIdAndNameIgnoreCase(Long leagueId, String name);
 }

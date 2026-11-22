@@ -1,11 +1,12 @@
 package com.friendsleague.squad;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-// Makes up Hebrew footballer names. One generator per league, so names don't repeat inside the same league.
+// Makes up Hebrew footballer names. One generator per league, so no name repeats inside the same league.
 public class NameGenerator {
 
     private static final List<String> FIRST_NAMES = List.of(
@@ -26,7 +27,13 @@ public class NameGenerator {
     private final Set<String> used = new HashSet<>();
 
     public NameGenerator(Random random) {
+        this(random, List.of());
+    }
+
+    // For a league that already has footballers: their names count as used.
+    public NameGenerator(Random random, Collection<String> alreadyUsed) {
         this.random = random;
+        this.used.addAll(alreadyUsed);
     }
 
     // Tries to find a name not used yet in this league. 40 x 40 = 1,600 combinations, so this almost always works.
