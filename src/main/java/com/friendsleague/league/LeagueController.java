@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Clock;
 import java.util.List;
 
-// Creating, joining and starting leagues. Every address here needs a logged-in player.
+// Creating, joining, starting and viewing leagues. Every address here needs a logged-in player.
 @RestController
 @RequestMapping("/api/leagues")
 public class LeagueController {
@@ -26,10 +27,12 @@ public class LeagueController {
 
     private final LeagueService leagueService;
     private final LeagueQueries queries;
+    private final Clock clock;
 
-    public LeagueController(LeagueService leagueService, LeagueQueries queries) {
+    public LeagueController(LeagueService leagueService, LeagueQueries queries, Clock clock) {
         this.leagueService = leagueService;
         this.queries = queries;
+        this.clock = clock;
     }
 
     @GetMapping
@@ -56,5 +59,17 @@ public class LeagueController {
     public LeagueSummary start(@CurrentAccount Account account, @PathVariable Long leagueId) {
         leagueService.startSeason(account.getId(), leagueId);
         return queries.summary(account.getId(), leagueId);
+    }
+
+    // The league page: the league, the current round and the table.
+    @GetMapping("/{leagueId}")
+    public LeagueDetails details(@CurrentAccount Account account, @PathVariable Long leagueId) {
+        return queries.details(account.getId(), leagueId, clock.instant());
+    }
+
+    // The games of one round, as they look right now (the browser asks again every few seconds during the broadcast).
+    @GetMapping("/{leagueId}/rounds/{round}")
+    public List<GameView> round(@CurrentAccount Account account, @PathVariable Long leagueId, @PathVariable int round) {
+        return queries.round(account.getId(), leagueId, round, clock.instant());
     }
 }

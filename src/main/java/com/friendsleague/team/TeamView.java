@@ -1,0 +1,16 @@
+package com.friendsleague.team;
+
+import com.friendsleague.match.Tactic;
+import com.friendsleague.squad.Formation;
+import com.friendsleague.squad.Position;
+
+import java.util.List;
+
+// A team as the browser sees it. "mine" tells the page whether to show the editing controls.
+public record TeamView(Long id, Long leagueId, String name, boolean computer, boolean mine, long money,
+                       Formation formation, Tactic tactic, List<FootballerView> squad) {
+
+    // "line" is where the footballer plays in the saved lineup, or null if he is on the bench.
+    public record FootballerView(Long id, String name, Position position, int rating, int age, Position line) {
+    }
+}

@@ -39,8 +39,8 @@ public class RoundRunner {
         playDueGames(clock.instant());
     }
 
-    // Returns how many games were played.
-    int playDueGames(Instant now) {
+    // Returns how many games were played. Public so tests can choose the moment.
+    public int playDueGames(Instant now) {
         List<Game> due = games.findByKickoffAtLessThanEqualAndHomeGoalsIsNullOrderByKickoffAt(now);
         int played = 0;
         for (Game game : due) {
