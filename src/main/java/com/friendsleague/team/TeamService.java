@@ -1,7 +1,10 @@
 package com.friendsleague.team;
 
 import com.friendsleague.league.LeagueException;
+import com.friendsleague.league.LeagueStatus;
 import com.friendsleague.match.Tactic;
+import com.friendsleague.money.Prices;
+import com.friendsleague.money.Sponsor;
 import com.friendsleague.squad.FootballerProfile;
 import com.friendsleague.squad.Formation;
 import com.friendsleague.squad.Lineup;
@@ -19,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-// Viewing a team and changing its lineup.
+// Viewing a team, changing its lineup, choosing a sponsor and reading the account history.
 @Service
 public class TeamService {
 
@@ -28,10 +31,12 @@ public class TeamService {
 
     private final TeamRepository teams;
     private final FootballerRepository footballers;
+    private final MoneyRecordRepository moneyRecords;
 
-    public TeamService(TeamRepository teams, FootballerRepository footballers) {
+    public TeamService(TeamRepository teams, FootballerRepository footballers, MoneyRecordRepository moneyRecords) {
         this.teams = teams;
         this.footballers = footballers;
+        this.moneyRecords = moneyRecords;
     }
 
     // Anyone in the league can look at a team (to scout the next opponent).
@@ -114,6 +119,30 @@ public class TeamService {
         return toView(team, accountId);
     }
 
+    // The sponsor deal is for a whole season, so it can only be changed before the season starts.
+    @Transactional
+    public TeamView chooseSponsor(Long accountId, Long teamId, Sponsor sponsor) {
+        Team team = myTeam(accountId, teamId);
+        if (sponsor == null) {
+            throw new LeagueException("Please choose a sponsor");
+        }
+        if (team.getLeague().getStatus() == LeagueStatus.RUNNING) {
+            throw new LeagueException("The sponsor can only be changed between seasons");
+        }
+        team.chooseSponsor(sponsor);
+        return toView(team, accountId);
+    }
+
+    // Only the manager sees his own account history.
+    @Transactional(readOnly = true)
+    public List<MoneyRecordView> moneyHistory(Long accountId, Long teamId) {
+        myTeam(accountId, teamId);
+        return moneyRecords.findByTeamIdOrderByIdDesc(teamId).stream()
+                .map(r -> new MoneyRecordView(r.getSeason(), r.getRound(), r.getKind(), r.getAmount(), r.getNote(),
+                        r.getCreatedAt()))
+                .toList();
+    }
+
     private Team myTeam(Long accountId, Long teamId) {
         Team team = findTeam(teamId);
         if (team.isComputer() || !team.getAccount().getId().equals(accountId)) {
@@ -132,11 +161,14 @@ public class TeamService {
 
         List<TeamView.FootballerView> squad = footballers.findByTeamIdOrderById(team.getId()).stream()
                 .map(f -> new TeamView.FootballerView(f.getId(), f.getName(), f.getPosition(), f.getRating(),
-                        f.getAge(), lineFor.get(f.getId())))
+                        f.getAge(), lineFor.get(f.getId()), Prices.wage(f.getRating()),
+                        Prices.sellPrice(f.getRating(), f.getAge())))
                 .toList();
+        long wages = squad.stream().mapToLong(TeamView.FootballerView::wage).sum();
 
         boolean mine = !team.isComputer() && team.getAccount().getId().equals(accountId);
         return new TeamView(team.getId(), team.getLeague().getId(), team.getName(), team.isComputer(), mine,
-                team.getMoney(), team.getFormation(), team.getTactic(), squad);
+                team.getMoney(), team.getSponsor(), team.getRoundsInDebt(), wages,
+                team.getFormation(), team.getTactic(), squad);
     }
 }

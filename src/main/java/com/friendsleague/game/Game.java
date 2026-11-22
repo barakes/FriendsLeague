@@ -60,6 +60,10 @@ public class Game {
     @Column(name = "away_goals")
     private Integer awayGoals;
 
+    // True after the money of this game was paid (when its live broadcast ended).
+    @Column(nullable = false)
+    private boolean settled;
+
     // @OrderColumn keeps the goals in the order they were saved, in the "seq" column.
     @ElementCollection
     @CollectionTable(name = "game_goals", joinColumns = @JoinColumn(name = "game_id"))
@@ -98,6 +102,25 @@ public class Game {
         for (Goal goal : result.goals()) {
             goals.add(new GameGoal(goal.minute(), goal.side(), goal.scorer()));
         }
+    }
+
+    // Side.HOME or Side.AWAY, or null for a draw. Only for a game that was played.
+    public Side winner() {
+        if (!isPlayed()) {
+            throw new IllegalStateException("Game " + id + " was not played yet");
+        }
+        if (homeGoals > awayGoals) {
+            return Side.HOME;
+        }
+        return awayGoals > homeGoals ? Side.AWAY : null;
+    }
+
+    public boolean isSettled() {
+        return settled;
+    }
+
+    public void markSettled() {
+        settled = true;
     }
 
     // ---------- The live view: only what has "happened" by now ----------

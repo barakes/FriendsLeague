@@ -2,6 +2,7 @@ package com.friendsleague.team;
 
 import com.friendsleague.account.Account;
 import com.friendsleague.match.Tactic;
+import com.friendsleague.money.Sponsor;
 import com.friendsleague.squad.Formation;
 import com.friendsleague.web.CurrentAccount;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,9 @@ public class TeamController {
     }
 
     public record BestLineupRequest(Formation formation) {
+    }
+
+    public record SponsorRequest(Sponsor sponsor) {
     }
 
     private final TeamService teamService;
@@ -45,5 +49,16 @@ public class TeamController {
     public TeamView pickBestLineup(@CurrentAccount Account account, @PathVariable Long teamId,
                                    @RequestBody BestLineupRequest request) {
         return teamService.pickBestLineup(account.getId(), teamId, request.formation());
+    }
+
+    @PutMapping("/{teamId}/sponsor")
+    public TeamView chooseSponsor(@CurrentAccount Account account, @PathVariable Long teamId,
+                                  @RequestBody SponsorRequest request) {
+        return teamService.chooseSponsor(account.getId(), teamId, request.sponsor());
+    }
+
+    @GetMapping("/{teamId}/money")
+    public List<MoneyRecordView> moneyHistory(@CurrentAccount Account account, @PathVariable Long teamId) {
+        return teamService.moneyHistory(account.getId(), teamId);
     }
 }

@@ -3,6 +3,8 @@ package com.friendsleague.team;
 import com.friendsleague.account.Account;
 import com.friendsleague.league.League;
 import com.friendsleague.match.Tactic;
+import com.friendsleague.money.DebtRules;
+import com.friendsleague.money.Sponsor;
 import com.friendsleague.squad.Formation;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -56,6 +58,18 @@ public class Team {
     @Column(nullable = false, length = 10)
     private Tactic tactic = Tactic.BALANCED;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private Sponsor sponsor = Sponsor.SAFE;
+
+    // How many rounds in a row the team ended below zero. Back to 0 as soon as it has money again.
+    @Column(name = "rounds_in_debt", nullable = false)
+    private int roundsInDebt;
+
+    // Points lost this season for staying in debt.
+    @Column(name = "points_deducted", nullable = false)
+    private int pointsDeducted;
+
     // The saved lineup, in the "lineup_slots" table.
     @ElementCollection
     @CollectionTable(name = "lineup_slots", joinColumns = @JoinColumn(name = "team_id"))
@@ -99,6 +113,24 @@ public class Team {
         money += amount;
     }
 
+    public void chooseSponsor(Sponsor newSponsor) {
+        this.sponsor = newSponsor;
+    }
+
+    public boolean isInDebt() {
+        return money < 0;
+    }
+
+    // The money of one round: income minus wages. Then the debt rules are checked.
+    // Returns the points deducted this round (usually 0).
+    public int settleRound(long amount) {
+        money += amount;
+        roundsInDebt = isInDebt() ? roundsInDebt + 1 : 0;
+        int deducted = DebtRules.pointsToDeduct(roundsInDebt);
+        pointsDeducted += deducted;
+        return deducted;
+    }
+
     public Long getId() {
         return id;
     }
@@ -125,6 +157,18 @@ public class Team {
 
     public Tactic getTactic() {
         return tactic;
+    }
+
+    public Sponsor getSponsor() {
+        return sponsor;
+    }
+
+    public int getRoundsInDebt() {
+        return roundsInDebt;
+    }
+
+    public int getPointsDeducted() {
+        return pointsDeducted;
     }
 
     public Set<LineupSlot> getLineup() {

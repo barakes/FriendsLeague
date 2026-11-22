@@ -1,5 +1,6 @@
 package com.friendsleague.game;
 
+import com.friendsleague.match.LiveClock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -11,9 +12,11 @@ import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 
-// Plays every game whose kick-off time has come.
-// Runs every 30 seconds, and also right when the server starts: if the server was asleep at kick-off time,
-// the games are played as soon as it wakes up. The live view still counts from the original kick-off time.
+// Every 30 seconds, and also right when the server starts:
+// 1. Plays every game whose kick-off time has come.
+// 2. Pays the money of every game whose live broadcast has ended.
+// If the server was asleep, everything that was missed is done as soon as it wakes up, oldest first.
+// The live view still counts from the original kick-off time.
 @Component
 public class RoundRunner {
 
@@ -21,22 +24,26 @@ public class RoundRunner {
 
     private final GameRepository games;
     private final GamePlayer player;
+    private final GameSettler settler;
     private final Clock clock;
 
-    public RoundRunner(GameRepository games, GamePlayer player, Clock clock) {
+    public RoundRunner(GameRepository games, GamePlayer player, GameSettler settler, Clock clock) {
         this.games = games;
         this.player = player;
+        this.settler = settler;
         this.clock = clock;
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void catchUpOnStart() {
-        playDueGames();
+        tick();
     }
 
     @Scheduled(fixedDelay = 30_000, initialDelay = 30_000)
-    public void playDueGames() {
-        playDueGames(clock.instant());
+    public void tick() {
+        Instant now = clock.instant();
+        playDueGames(now);
+        settleFinishedGames(now);
     }
 
     // Returns how many games were played. Public so tests can choose the moment.
@@ -56,5 +63,21 @@ public class RoundRunner {
             log.info("Played {} games", played);
         }
         return played;
+    }
+
+    // Returns how many games were paid. A game is paid once its broadcast is over: kick-off + 4.5 minutes.
+    public int settleFinishedGames(Instant now) {
+        Instant latestKickoff = now.minus(LiveClock.GAME_LENGTH);
+        List<Game> finished = games.findByKickoffAtLessThanEqualAndHomeGoalsIsNotNullAndSettledFalseOrderByKickoffAtAscIdAsc(latestKickoff);
+        int settled = 0;
+        for (Game game : finished) {
+            try {
+                settler.settle(game.getId());
+                settled++;
+            } catch (RuntimeException e) {
+                log.error("Could not pay the money of game {}", game.getId(), e);
+            }
+        }
+        return settled;
     }
 }

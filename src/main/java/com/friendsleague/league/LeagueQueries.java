@@ -73,14 +73,19 @@ public class LeagueQueries {
             }
         }
 
-        List<TableRow> rows = LeagueTable.build(leagueTeams.size(), finished);
+        int[] deducted = new int[leagueTeams.size()];
+        for (int i = 0; i < leagueTeams.size(); i++) {
+            deducted[i] = leagueTeams.get(i).getPointsDeducted();
+        }
+
+        List<TableRow> rows = LeagueTable.build(leagueTeams.size(), finished, deducted);
         List<TableEntry> table = new ArrayList<>(rows.size());
         for (int i = 0; i < rows.size(); i++) {
             TableRow row = rows.get(i);
             Team team = leagueTeams.get(row.team());
             table.add(new TableEntry(i + 1, team.getId(), team.getName(), team.isComputer(),
                     team.getId().equals(myTeam.getId()), row.played(), row.wins(), row.draws(), row.losses(),
-                    row.goalsFor(), row.goalsAgainst(), row.goalDifference(), row.points()));
+                    row.goalsFor(), row.goalsAgainst(), row.goalDifference(), row.points(), row.pointsDeducted()));
         }
         return table;
     }

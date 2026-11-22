@@ -13,4 +13,7 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 
     // Games whose kick-off time has come but that were not played yet (for example, the server was asleep).
     List<Game> findByKickoffAtLessThanEqualAndHomeGoalsIsNullOrderByKickoffAt(Instant now);
+
+    // Games that were played, kicked off at "kickoff" or earlier, and whose money was not paid yet.
+    List<Game> findByKickoffAtLessThanEqualAndHomeGoalsIsNotNullAndSettledFalseOrderByKickoffAtAscIdAsc(Instant kickoff);
 }
