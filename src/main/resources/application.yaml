@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: friendsleague
+
+  # The real values come from environment variables, never from the code:
+  # in IntelliJ (the development branch in Neon) and in Render (the production branch).
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+
+  jpa:
+    hibernate:
+      # Flyway creates the tables; Hibernate only checks that the Java classes match them.
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    enabled: true
+
+server:
+  port: ${PORT:8080}
