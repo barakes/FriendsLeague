@@ -1,0 +1,9 @@
+# Search engines may index the home page. The other pages need a login, so there is nothing to index there.
+User-agent: *
+Allow: /$
+Disallow: /api/
+Disallow: /league.html
+Disallow: /team.html
+Disallow: /market.html
+
+Sitemap: https://friendsleague.onrender.com/sitemap.xml
