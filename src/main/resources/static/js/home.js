@@ -62,7 +62,7 @@ async function loadLeagues() {
         "הקבוצה שלך: " + league.myTeamName + " · " + league.teams + "/" + league.size + " קבוצות · עונה " + league.season));
 
     const side = el("div", { style: "text-align: left;" }, el("span", { className: "badge" }, STATUS_NAMES[league.status]));
-    if (league.status === "WAITING") {
+    if (league.status !== "RUNNING") {
       side.append(el("div", { className: "muted" }, "קוד: ", el("span", { className: "code" }, league.joinCode)));
     }
     list.append(el("li", null, details, side));

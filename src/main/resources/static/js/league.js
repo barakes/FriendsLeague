@@ -25,6 +25,8 @@ async function refresh() {
   try {
     details = await api("GET", "/api/leagues/" + leagueId);
     showLeague();
+    showSeasonEnd();
+    showChampions();
     showTable();
     delay = await showRound();
   } catch (e) {
@@ -77,6 +79,51 @@ document.getElementById("start-button").addEventListener("click", async () => {
     button.disabled = false;
   }
 });
+
+// ---------- Between seasons ----------
+
+function showSeasonEnd() {
+  const league = details.league;
+  const ended = league.status === "BETWEEN_SEASONS";
+  document.getElementById("season-end-card").classList.toggle("hidden", !ended);
+  if (!ended) {
+    return;
+  }
+
+  document.getElementById("season-end-title").textContent = "עונה " + league.season + " הסתיימה";
+  const champion = details.champions.find(c => c.season === league.season);
+  document.getElementById("champion-text").textContent = champion
+    ? "🏆 האלופה: " + champion.teamName + " עם " + champion.points + " נקודות"
+    : "";
+
+  const computers = details.table.filter(row => row.computer).length;
+  document.getElementById("invite-text").classList.toggle("hidden", computers === 0);
+  document.getElementById("between-code").textContent = league.joinCode;
+  document.getElementById("next-season-box").classList.toggle("hidden", !league.owner);
+}
+
+document.getElementById("next-season-button").addEventListener("click", async () => {
+  const button = document.getElementById("next-season-button");
+  button.disabled = true;
+  try {
+    await api("POST", "/api/leagues/" + leagueId + "/start");
+    shownRound = null;
+    followed = null;
+    await refresh();
+  } catch (e) {
+    showMessage(document.getElementById("next-season-message"), e.message, "error");
+  } finally {
+    button.disabled = false;
+  }
+});
+
+function showChampions() {
+  document.getElementById("champions-card").classList.toggle("hidden", details.champions.length === 0);
+  document.getElementById("champions-list").replaceChildren(...details.champions.map(champion =>
+    el("li", null,
+      el("span", null, "עונה " + champion.season + ": ", el("strong", null, champion.teamName)),
+      el("span", { className: "muted" }, champion.points + " נקודות"))));
+}
 
 // ---------- The table ----------
 

@@ -172,10 +172,14 @@ class SeasonTest extends IntegrationTest {
     }
 
     @Test
-    void pointsLostForDebtAreForgottenInTheNewSeason() {
+    void pointsLostForDebtAreForgottenOnlyWhenTheNextSeasonStarts() {
         transaction.executeWithoutResult(status -> teams.findById(danaTeam).orElseThrow().addMoney(-50_000_000));
 
         playRounds(1, 10);
+        // The final table of the season that ended still shows them.
+        assertThat(teams.findById(danaTeam).orElseThrow().getPointsDeducted()).isEqualTo(9);
+
+        leagueService.startSeason(dana.getId(), league.getId());
 
         assertThat(teams.findById(danaTeam).orElseThrow().getPointsDeducted()).isZero();
         assertThat(teams.findById(danaTeam).orElseThrow().getRoundsInDebt()).isPositive();

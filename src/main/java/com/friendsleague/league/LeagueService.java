@@ -141,6 +141,8 @@ public class LeagueService {
         if (league.getStatus() == LeagueStatus.BETWEEN_SEASONS) {
             league.startNextSeason();
             List<Team> leagueTeams = new ArrayList<>(teams.findByLeagueIdOrderById(league.getId()));
+            // A new table: points lost for debt last season are forgotten.
+            leagueTeams.forEach(Team::startNewSeason);
             Collections.shuffle(leagueTeams, random);
             createSchedule(league, leagueTeams);
             return;

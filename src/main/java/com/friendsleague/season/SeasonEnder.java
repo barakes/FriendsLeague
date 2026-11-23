@@ -37,7 +37,8 @@ import java.util.Set;
 // Ends a season once the money of its last game was paid:
 // 1. Prize money by the final table, and the champion is remembered.
 // 2. Every footballer gets a year older; the oldest retire; small squads get academy players.
-// 3. The market is topped up, points lost for debt are forgotten, and the league waits for the next season.
+// 3. The market is topped up, and the league waits for the next season.
+// Points lost for debt stay until the next season starts, so the final table still shows them.
 @Service
 public class SeasonEnder {
 
@@ -78,7 +79,6 @@ public class SeasonEnder {
         payPrizes(league, leagueTeams, season);
         ageFootballers(league, leagueTeams);
         topUpMarket(league);
-        leagueTeams.forEach(Team::startNewSeason);
         league.endSeason();
         return true;
     }

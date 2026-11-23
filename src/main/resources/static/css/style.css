@@ -281,3 +281,8 @@ tr.group-row td {
   background: var(--line);
   padding: 6px 8px;
 }
+
+/* ---------- End of a season ---------- */
+
+.season-end { border: 2px solid var(--accent); background: #fffaeb; }
+.champion { font-size: 1.25rem; font-weight: 700; color: var(--pitch-dark); margin: 4px 0 10px; }

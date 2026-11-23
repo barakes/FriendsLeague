@@ -37,6 +37,20 @@
     <div id="start-message" class="message hidden"></div>
   </div>
 
+  <!-- After the last game of a season: the champion, and the button for the next season. -->
+  <div class="card hidden season-end" id="season-end-card">
+    <h2 id="season-end-title"></h2>
+    <p id="champion-text" class="champion"></p>
+    <p class="muted">הכסף נשאר בקופה, כל השחקנים התבגרו בשנה, הוותיקים ביותר פרשו, והשוק התמלא בשחקנים חדשים.
+      עכשיו אפשר לקנות, למכור ולהחליף נותן חסות.</p>
+    <p class="muted hidden" id="invite-text">חברים חדשים יכולים להצטרף עם הקוד <span class="code" id="between-code"></span>
+      ולקבל אחת מקבוצות המחשב.</p>
+    <div class="form-actions hidden" id="next-season-box">
+      <button id="next-season-button">התחלת העונה הבאה</button>
+    </div>
+    <div id="next-season-message" class="message hidden"></div>
+  </div>
+
   <div class="grid-2">
     <div class="card" id="round-card">
       <div class="round-nav">
@@ -61,6 +75,11 @@
       </div>
       <p class="muted">הטבלה מתעדכנת רק בסוף השידור של כל משחק, כדי לא לגלות תוצאות מראש.</p>
     </div>
+  </div>
+
+  <div class="card hidden" id="champions-card">
+    <h2>🏆 אלופות עבר</h2>
+    <ul class="league-list" id="champions-list"></ul>
   </div>
 </main>
 
