@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ליגת חברים – ליגה</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header class="top-bar">
+  <a class="logo" href="/">ליגת <span>חברים</span></a>
+  <div class="user-box" id="user-box"></div>
+</header>
+
+<main>
+  <div class="card page-title">
+    <div>
+      <h1 id="league-name"></h1>
+      <div class="muted" id="league-info"></div>
+    </div>
+    <div class="actions">
+      <a class="button" id="my-team-link">הקבוצה שלי</a>
+      <a class="button secondary hidden" id="market-link">שוק השחקנים</a>
+    </div>
+  </div>
+
+  <!-- Before the season: the code to share, and the start button for the league's creator. -->
+  <div class="card hidden" id="waiting-card">
+    <h2>הליגה ממתינה לפתיחה</h2>
+    <p>שלחו לחברים את הקוד: <span class="code" id="join-code"></span></p>
+    <p class="muted" id="waiting-text"></p>
+    <div class="form-actions hidden" id="start-box">
+      <button id="start-button">התחלת העונה</button>
+    </div>
+    <div id="start-message" class="message hidden"></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card" id="round-card">
+      <div class="round-nav">
+        <button class="secondary small" id="previous-round" title="המחזור הקודם">→</button>
+        <h2 id="round-title"></h2>
+        <button class="secondary small" id="next-round" title="המחזור הבא">←</button>
+      </div>
+      <div id="games"></div>
+    </div>
+
+    <div class="card">
+      <h2>טבלה</h2>
+      <div class="table-scroll">
+        <table>
+          <thead>
+          <tr>
+            <th>#</th><th class="name">קבוצה</th><th>מש'</th><th>נ</th><th>ת</th><th>ה</th><th class="goals-column">שערים</th><th>הפרש</th><th>נק'</th>
+          </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+      <p class="muted">הטבלה מתעדכנת רק בסוף השידור של כל משחק, כדי לא לגלות תוצאות מראש.</p>
+    </div>
+  </div>
+</main>
+
+<script src="/js/api.js"></script>
+<script src="/js/league.js"></script>
+</body>
+</html>

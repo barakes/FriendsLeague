@@ -153,3 +153,75 @@ tr.mine { background: #fff7dd; font-weight: 600; }
 .table-scroll { overflow-x: auto; }
 
 .code { font-family: monospace; font-size: 1.1rem; letter-spacing: 2px; font-weight: 700; }
+
+/* ---------- League page ---------- */
+
+.page-title { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.page-title h1 { margin: 0; font-size: 1.5rem; }
+.page-title .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+a.button {
+  display: inline-block;
+  padding: 9px 16px;
+  border-radius: 8px;
+  background: var(--pitch);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+a.button.secondary { background: #fff; color: var(--pitch); border: 1px solid var(--pitch); }
+
+.round-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.round-nav h2 { margin: 0; }
+
+.game {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.game:last-child { border-bottom: none; }
+.game .home { text-align: right; font-weight: 500; }
+.game .away { text-align: left; font-weight: 500; }
+.game .mine-team { color: var(--pitch); font-weight: 700; }
+
+.score {
+  min-width: 92px;
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  direction: ltr;
+}
+
+.score .when { display: block; font-size: 0.8rem; font-weight: 400; color: var(--muted); direction: rtl; }
+.score .minute { display: block; font-size: 0.8rem; font-weight: 700; color: var(--bad); direction: rtl; }
+
+.goals {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 20px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.goals .home-goals { text-align: right; }
+.goals .away-goals { text-align: left; }
+
+@keyframes flash { from { background: #fff3c4; } to { background: transparent; } }
+.new-goal { animation: flash 2.5s ease-out; }
+
+.points-off { color: var(--bad); font-size: 0.8rem; }
+
+td.name a { color: var(--text); text-decoration: none; }
+td.name a:hover { text-decoration: underline; }
+
+@media (max-width: 500px) {
+  /* On a phone the goals column is dropped; the goal difference is enough. */
+  th.goals-column, td.goals-column { display: none; }
+}
