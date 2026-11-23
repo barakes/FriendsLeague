@@ -4,6 +4,7 @@ import com.friendsleague.account.Account;
 import com.friendsleague.account.AccountRepository;
 import com.friendsleague.game.Game;
 import com.friendsleague.game.GameRepository;
+import com.friendsleague.market.MarketGenerator;
 import com.friendsleague.squad.FootballerProfile;
 import com.friendsleague.squad.Formation;
 import com.friendsleague.squad.Lineup;
@@ -31,7 +32,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-// Creating a league, joining it, and starting the season.
+// Creating a league, joining it, and starting the season (with a fresh transfer market).
 @Service
 public class LeagueService {
 
@@ -119,6 +120,7 @@ public class LeagueService {
         List<Team> leagueTeams = new ArrayList<>(teams.findByLeagueIdOrderById(league.getId()));
         Collections.shuffle(leagueTeams, random);
         createSchedule(league, leagueTeams);
+        fillMarket(league);
 
         league.start();
     }
@@ -142,6 +144,16 @@ public class LeagueService {
                 missing--;
             }
         }
+    }
+
+    // The transfer market opens with the season: free agents without a team.
+    private void fillMarket(League league) {
+        NameGenerator names = new NameGenerator(random, footballers.findNamesByLeagueId(league.getId()));
+        List<Footballer> market = new ArrayList<>();
+        for (FootballerProfile profile : new MarketGenerator(random, names).generate(league.getTeamCount())) {
+            market.add(new Footballer(league, null, profile));
+        }
+        footballers.saveAll(market);
     }
 
     private void createSchedule(League league, List<Team> order) {

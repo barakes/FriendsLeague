@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,11 +31,14 @@ public class TeamService {
     private final TeamRepository teams;
     private final FootballerRepository footballers;
     private final MoneyRecordRepository moneyRecords;
+    private final LineupPicker lineupPicker;
 
-    public TeamService(TeamRepository teams, FootballerRepository footballers, MoneyRecordRepository moneyRecords) {
+    public TeamService(TeamRepository teams, FootballerRepository footballers, MoneyRecordRepository moneyRecords,
+                       LineupPicker lineupPicker) {
         this.teams = teams;
         this.footballers = footballers;
         this.moneyRecords = moneyRecords;
+        this.lineupPicker = lineupPicker;
     }
 
     // Anyone in the league can look at a team (to scout the next opponent).
@@ -96,26 +98,7 @@ public class TeamService {
         if (formation == null) {
             throw new LineupException("Please choose a formation");
         }
-
-        List<Footballer> squad = footballers.findByTeamIdOrderById(teamId);
-        Map<FootballerProfile, Footballer> byProfile = new IdentityHashMap<>();
-        List<FootballerProfile> profiles = new ArrayList<>();
-        for (Footballer footballer : squad) {
-            FootballerProfile profile = footballer.toProfile();
-            byProfile.put(profile, footballer);
-            profiles.add(profile);
-        }
-
-        Lineup best = Lineup.best(formation, profiles);
-        List<LineupSlot> slots = new ArrayList<>();
-        for (Position line : Position.values()) {
-            for (FootballerProfile profile : best.playersIn(line)) {
-                slots.add(new LineupSlot(byProfile.get(profile).getId(), line));
-            }
-        }
-
-        team.changeTactics(formation, team.getTactic());
-        team.saveLineup(slots);
+        lineupPicker.pickBest(team, formation);
         return toView(team, accountId);
     }
 
@@ -155,7 +138,8 @@ public class TeamService {
         return teams.findById(teamId).orElseThrow(() -> new LeagueException("There is no such team"));
     }
 
-    private TeamView toView(Team team, Long accountId) {
+    // Builds the view of a team that is already loaded. No transaction of its own: the caller's transaction is used.
+    public TeamView toView(Team team, Long accountId) {
         Map<Long, Position> lineFor = new HashMap<>();
         team.getLineup().forEach(slot -> lineFor.put(slot.getFootballerId(), slot.getLine()));
 
