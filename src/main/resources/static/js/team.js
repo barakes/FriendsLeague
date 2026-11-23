@@ -146,24 +146,38 @@ function showPitch() {
 
 // ---------- The squad ----------
 
+// The saved lineup first (goalkeeper to attack), then the bench. The order follows the saved lineup,
+// so rows don't jump around while the manager is still choosing; after saving, they move to their place.
 function showSquad() {
   document.getElementById("sell-header").classList.toggle("hidden", !team.mine);
-  const order = (a, b) => POSITIONS.indexOf(a.position) - POSITIONS.indexOf(b.position) || b.rating - a.rating;
-  const body = document.getElementById("squad-body");
-  body.replaceChildren();
+  const columns = team.mine ? 6 : 5;
+  const byLine = (line) => (a, b) => POSITIONS.indexOf(line(a)) - POSITIONS.indexOf(line(b)) || b.rating - a.rating;
+  const starters = team.squad.filter(f => f.line).sort(byLine(f => f.line));
+  const bench = team.squad.filter(f => !f.line).sort(byLine(f => f.position));
 
-  for (const player of [...team.squad].sort(order)) {
-    const row = el("tr", null,
-      el("td", { className: "name" }, player.name),
-      el("td", null, POSITION_NAMES[player.position]),
-      el("td", { className: "rating-cell" }, player.rating),
-      el("td", null, player.age),
-      el("td", null, team.mine ? lineSelect(player) : (player.line ? POSITION_NAMES[player.line] : "ספסל")));
-    if (team.mine) {
-      row.append(el("td", null, sellButton(player)));
-    }
-    body.append(row);
+  const body = document.getElementById("squad-body");
+  body.replaceChildren(
+    groupRow("בהרכב (" + starters.length + ")", columns),
+    ...starters.map(squadRow),
+    groupRow("ספסל (" + bench.length + ")", columns),
+    ...bench.map(squadRow));
+}
+
+function groupRow(title, columns) {
+  return el("tr", { className: "group-row" }, el("td", { colSpan: columns }, title));
+}
+
+function squadRow(player) {
+  const row = el("tr", null,
+    el("td", { className: "name" }, player.name),
+    el("td", null, POSITION_NAMES[player.position]),
+    el("td", { className: "rating-cell" }, player.rating),
+    el("td", null, player.age),
+    el("td", null, team.mine ? lineSelect(player) : (player.line ? POSITION_NAMES[player.line] : "ספסל")));
+  if (team.mine) {
+    row.append(el("td", null, sellButton(player)));
   }
+  return row;
 }
 
 function lineSelect(player) {

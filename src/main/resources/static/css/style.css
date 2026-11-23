@@ -272,3 +272,12 @@ td.name a:hover { text-decoration: underline; }
 .rating-cell { font-weight: 700; }
 
 .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+
+/* "In the lineup" / "Bench" titles inside the squad table. */
+tr.group-row td {
+  text-align: right;
+  font-weight: 700;
+  color: var(--pitch-dark);
+  background: var(--line);
+  padding: 6px 8px;
+}
