@@ -79,6 +79,12 @@ public class Footballer {
         this.team = newTeam;
     }
 
+    // Between seasons: a year older, with the new rating.
+    public void growOlder(int newAge, int newRating) {
+        this.age = newAge;
+        this.rating = newRating;
+    }
+
     public Long getId() {
         return id;
     }

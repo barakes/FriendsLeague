@@ -13,6 +13,9 @@ public interface FootballerRepository extends JpaRepository<Footballer, Long> {
 
     List<Footballer> findByTeamIdOrderById(Long teamId);
 
+    // Every footballer of the league: in teams and on the market.
+    List<Footballer> findByLeagueIdOrderById(Long leagueId);
+
     // The transfer market of a league: footballers without a team.
     List<Footballer> findByLeagueIdAndTeamIsNullOrderByRatingDesc(Long leagueId);
 

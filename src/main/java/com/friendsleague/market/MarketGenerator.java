@@ -48,6 +48,15 @@ public class MarketGenerator {
         return market;
     }
 
+    // New free agents in random positions, to top up the market between seasons.
+    public List<FootballerProfile> more(int count) {
+        List<FootballerProfile> footballers = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            footballers.add(newFootballer(randomPosition()));
+        }
+        return footballers;
+    }
+
     private FootballerProfile newFootballer(Position position) {
         int age = YOUNGEST + random.nextInt(OLDEST - YOUNGEST + 1);
         return new FootballerProfile(names.next(), position, randomRating(), age);

@@ -2,6 +2,7 @@ package com.friendsleague.game;
 
 import com.friendsleague.market.ComputerTransfers;
 import com.friendsleague.match.LiveClock;
+import com.friendsleague.season.SeasonEnder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -11,12 +12,15 @@ import org.springframework.stereotype.Component;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 // Every 30 seconds, and also right when the server starts:
 // 1. Plays every game whose kick-off time has come.
 // 2. Pays the money of every game whose live broadcast has ended.
 //    Then the computer teams of that game may use the market.
+// 3. Ends the season of a league whose last game was just paid.
 // If the server was asleep, everything that was missed is done as soon as it wakes up, oldest first.
 // The live view still counts from the original kick-off time.
 @Component
@@ -28,14 +32,16 @@ public class RoundRunner {
     private final GamePlayer player;
     private final GameSettler settler;
     private final ComputerTransfers computerTransfers;
+    private final SeasonEnder seasonEnder;
     private final Clock clock;
 
     public RoundRunner(GameRepository games, GamePlayer player, GameSettler settler,
-                       ComputerTransfers computerTransfers, Clock clock) {
+                       ComputerTransfers computerTransfers, SeasonEnder seasonEnder, Clock clock) {
         this.games = games;
         this.player = player;
         this.settler = settler;
         this.computerTransfers = computerTransfers;
+        this.seasonEnder = seasonEnder;
         this.clock = clock;
     }
 
@@ -84,6 +90,7 @@ public class RoundRunner {
         Instant latestKickoff = now.minus(LiveClock.GAME_LENGTH);
         List<Game> finished = games.findByKickoffAtLessThanEqualAndHomeGoalsIsNotNullAndSettledFalseOrderByKickoffAtAscIdAsc(latestKickoff);
         int settled = 0;
+        Set<Long> leagueIds = new LinkedHashSet<>();
         for (Game game : finished) {
             try {
                 settler.settle(game.getId());
@@ -94,6 +101,15 @@ public class RoundRunner {
             }
             useMarket(game.getHomeTeam().getId());
             useMarket(game.getAwayTeam().getId());
+            leagueIds.add(game.getLeague().getId());
+        }
+
+        for (Long leagueId : leagueIds) {
+            try {
+                seasonEnder.endIfFinished(leagueId);
+            } catch (RuntimeException e) {
+                log.error("Could not end the season of league {}", leagueId, e);
+            }
         }
         return settled;
     }

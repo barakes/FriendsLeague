@@ -99,6 +99,16 @@ public class Team {
         this.account = newManager;
     }
 
+    // A friend who joins between seasons takes over a computer team and gives it his team's name.
+    public void rename(String newName) {
+        this.name = newName;
+    }
+
+    // A new season has a new table: points lost for debt are forgotten. Money and the debt counter stay.
+    public void startNewSeason() {
+        pointsDeducted = 0;
+    }
+
     public void changeTactics(Formation newFormation, Tactic newTactic) {
         this.formation = newFormation;
         this.tactic = newTactic;

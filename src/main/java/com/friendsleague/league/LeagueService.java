@@ -32,7 +32,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-// Creating a league, joining it, and starting the season (with a fresh transfer market).
+// Creating a league, joining it, and starting a season.
+// The first season also adds computer teams and opens the transfer market.
 @Service
 public class LeagueService {
 
@@ -84,34 +85,65 @@ public class LeagueService {
         return league;
     }
 
-    // A friend joins with the league's code, and gets a new team with a fresh squad.
+    // A friend joins with the league's code.
+    // Before the first season he gets a new team with a fresh squad.
+    // Between seasons he takes over a computer team, with its squad and money, under his own team name.
     @Transactional
     public Team joinLeague(Long accountId, String joinCode, String teamName) {
         String code = joinCode == null ? "" : joinCode.strip().toUpperCase(Locale.ROOT);
         League league = leagues.findByJoinCode(code)
                 .orElseThrow(() -> new LeagueException("There is no league with this code"));
 
-        if (league.getStatus() != LeagueStatus.WAITING) {
+        if (league.getStatus() == LeagueStatus.RUNNING) {
             throw new LeagueException("This league has already started; you can join next season");
         }
         if (teams.findByLeagueIdAndAccountId(league.getId(), accountId).isPresent()) {
             throw new LeagueException("You are already in this league");
         }
+        String name = checkName(teamName, 30, "Team name");
+
+        if (league.getStatus() == LeagueStatus.BETWEEN_SEASONS) {
+            return takeOverComputerTeam(league, accountId, name);
+        }
         if (teams.countByLeagueId(league.getId()) >= league.getTeamCount()) {
             throw new LeagueException("This league is full");
         }
-        return addTeam(league, accounts.getReferenceById(accountId), checkName(teamName, 30, "Team name"));
+        return addTeam(league, accounts.getReferenceById(accountId), name);
     }
 
-    // The creator starts the season: computer teams fill the empty places, and the whole schedule is created.
+    private Team takeOverComputerTeam(League league, Long accountId, String name) {
+        Team team = teams.findByLeagueIdOrderById(league.getId()).stream()
+                .filter(Team::isComputer)
+                .findFirst()
+                .orElseThrow(() -> new LeagueException("This league is full"));
+        // The computer team's own name may be reused, even with different capital letters.
+        if (!team.getName().equalsIgnoreCase(name) && teams.existsByLeagueIdAndNameIgnoreCase(league.getId(), name)) {
+            throw new LeagueException("This team name is taken in this league");
+        }
+        team.assignTo(accounts.getReferenceById(accountId));
+        team.rename(name);
+        return team;
+    }
+
+    // The creator starts a season and the whole schedule is created.
+    // The first time, computer teams fill the empty places and the transfer market opens.
+    // Between seasons, the same teams play a new season (the market is already open).
     @Transactional
     public void startSeason(Long accountId, Long leagueId) {
         League league = leagues.findById(leagueId).orElseThrow(() -> new LeagueException("There is no such league"));
         if (!league.getOwner().getId().equals(accountId)) {
             throw new LeagueException("Only the league's creator can start the season");
         }
-        if (league.getStatus() != LeagueStatus.WAITING) {
+        if (league.getStatus() == LeagueStatus.RUNNING) {
             throw new LeagueException("The season has already started");
+        }
+
+        if (league.getStatus() == LeagueStatus.BETWEEN_SEASONS) {
+            league.startNextSeason();
+            List<Team> leagueTeams = new ArrayList<>(teams.findByLeagueIdOrderById(league.getId()));
+            Collections.shuffle(leagueTeams, random);
+            createSchedule(league, leagueTeams);
+            return;
         }
 
         addComputerTeams(league);

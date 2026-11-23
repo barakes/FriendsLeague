@@ -4,6 +4,7 @@ import com.friendsleague.game.Game;
 import com.friendsleague.game.GameGoal;
 import com.friendsleague.game.GameRepository;
 import com.friendsleague.match.Side;
+import com.friendsleague.season.SeasonChampionRepository;
 import com.friendsleague.team.Team;
 import com.friendsleague.team.TeamRepository;
 import org.springframework.stereotype.Service;
@@ -23,10 +24,12 @@ public class LeagueQueries {
 
     private final TeamRepository teams;
     private final GameRepository games;
+    private final SeasonChampionRepository champions;
 
-    public LeagueQueries(TeamRepository teams, GameRepository games) {
+    public LeagueQueries(TeamRepository teams, GameRepository games, SeasonChampionRepository champions) {
         this.teams = teams;
         this.games = games;
+        this.champions = champions;
     }
 
     public List<LeagueSummary> myLeagues(Long accountId) {
@@ -47,7 +50,12 @@ public class LeagueQueries {
         int currentRound = season.stream().filter(game -> !game.isOverAt(now)).mapToInt(Game::getRound)
                 .min().orElse(totalRounds);
 
-        return new LeagueDetails(summary(myTeam, accountId), currentRound, totalRounds, table(league, myTeam, season, now));
+        List<ChampionView> pastChampions = champions.findByLeagueIdOrderBySeasonDesc(leagueId).stream()
+                .map(champion -> new ChampionView(champion.getSeason(), champion.getTeamName(), champion.getPoints()))
+                .toList();
+
+        return new LeagueDetails(summary(myTeam, accountId), currentRound, totalRounds,
+                table(league, myTeam, season, now), pastChampions);
     }
 
     public List<GameView> round(Long accountId, Long leagueId, int round, Instant now) {
