@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ליגת חברים – קבוצה</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header class="top-bar">
+  <a class="logo" href="/">ליגת <span>חברים</span></a>
+  <div class="user-box" id="user-box"></div>
+</header>
+
+<main>
+  <div class="card">
+    <div class="page-title">
+      <div>
+        <h1 id="team-name"></h1>
+        <div class="muted"><a id="league-link"></a> <span id="team-kind"></span></div>
+      </div>
+      <div class="actions">
+        <a class="button secondary hidden" id="market-link">שוק השחקנים</a>
+      </div>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h2>ההרכב</h2>
+      <div id="lineup-controls" class="hidden">
+        <div class="controls">
+          <div>
+            <label for="formation">מערך</label>
+            <select id="formation"></select>
+          </div>
+          <div>
+            <label for="tactic">טקטיקה</label>
+            <select id="tactic"></select>
+          </div>
+        </div>
+        <div class="line-counts" id="line-counts"></div>
+      </div>
+      <div class="pitch" id="pitch"></div>
+      <div class="form-actions hidden" id="lineup-buttons">
+        <button id="save-lineup">שמירת ההרכב</button>
+        <button class="secondary" id="best-lineup">בחר לי את ההרכב הכי טוב</button>
+      </div>
+      <div id="lineup-message" class="message hidden"></div>
+      <p class="muted" id="lineup-note"></p>
+    </div>
+
+    <div class="card">
+      <h2>הסגל</h2>
+      <div class="table-scroll">
+        <table class="squad-table">
+          <thead>
+          <tr><th class="name">שחקן</th><th>עמדה</th><th>דירוג</th><th>גיל</th><th>בהרכב</th><th id="sell-header" class="hidden"></th></tr>
+          </thead>
+          <tbody id="squad-body"></tbody>
+        </table>
+      </div>
+      <div id="squad-message" class="message hidden"></div>
+    </div>
+  </div>
+
+  <div class="grid-2 hidden" id="money-section">
+    <div class="card">
+      <h2>נותן חסות</h2>
+      <select id="sponsor"></select>
+      <p class="muted" id="sponsor-note"></p>
+      <div id="sponsor-message" class="message hidden"></div>
+    </div>
+    <div class="card">
+      <h2>היסטוריית הקופה</h2>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th class="name">מה</th><th>מחזור</th><th>סכום</th></tr></thead>
+          <tbody id="money-body"></tbody>
+        </table>
+      </div>
+      <p class="muted hidden" id="no-money">עוד אין תנועות בקופה.</p>
+    </div>
+  </div>
+</main>
+
+<script src="/js/api.js"></script>
+<script src="/js/team.js"></script>
+</body>
+</html>

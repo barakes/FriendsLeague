@@ -62,7 +62,16 @@ const MESSAGES = {
 };
 
 function hebrew(message) {
-  return MESSAGES[message] || "משהו השתבש. נסו שוב";
+  if (MESSAGES[message]) {
+    return MESSAGES[message];
+  }
+  if (message && message.startsWith("The formation ")) {
+    return "מספר השחקנים בכל קו לא מתאים למערך";
+  }
+  if (message && message.endsWith(" appears twice in the lineup")) {
+    return "אותו שחקן מופיע פעמיים בהרכב";
+  }
+  return "משהו השתבש. נסו שוב";
 }
 
 class ApiError extends Error {
@@ -169,10 +178,33 @@ function el(tag, props, ...children) {
   return element;
 }
 
+// -341000 → "-₪341,000"
 function money(amount) {
-  return "₪" + Number(amount).toLocaleString("he-IL");
+  const value = Number(amount);
+  return (value < 0 ? "-" : "") + "₪" + Math.abs(value).toLocaleString("he-IL");
 }
 
 const STATUS_NAMES = { WAITING: "ממתינה לפתיחה", RUNNING: "עונה פעילה", BETWEEN_SEASONS: "בין עונות" };
 const POSITION_NAMES = { GOALKEEPER: "שוער", DEFENDER: "הגנה", MIDFIELDER: "קישור", FORWARD: "התקפה" };
-const POSITION_SHORT = { GOALKEEPER: "שוע", DEFENDER: "הגנ", MIDFIELDER: "קשר", FORWARD: "חלו" };
+const POSITIONS = ["GOALKEEPER", "DEFENDER", "MIDFIELDER", "FORWARD"];
+const FORMATIONS = ["F_4_4_2", "F_4_3_3", "F_3_5_2", "F_5_3_2", "F_4_5_1"];
+const TACTIC_NAMES = { ATTACKING: "התקפית", BALANCED: "מאוזנת", DEFENSIVE: "הגנתית" };
+const SPONSOR_NAMES = {
+  SAFE: "בטוח – ₪80,000 בכל מחזור",
+  RISKY: "מסוכן – ₪30,000 בכל מחזור ועוד ₪60,000 על כל ניצחון"
+};
+const MONEY_NAMES = {
+  TV_RIGHTS: "זכויות שידור", TICKETS: "כרטיסים", WIN_BONUS: "בונוס ניצחון", DRAW_BONUS: "בונוס תיקו",
+  SPONSOR: "נותן חסות", WAGES: "משכורות", SEASON_PRIZE: "פרס סוף עונה", PURCHASE: "קניית שחקן", SALE: "מכירת שחקן"
+};
+
+// "F_4_3_3" → "4-3-3"
+function formationLabel(formation) {
+  return formation.substring(2).replaceAll("_", "-");
+}
+
+// How many players each line needs: "F_4_3_3" → {GOALKEEPER: 1, DEFENDER: 4, MIDFIELDER: 3, FORWARD: 3}
+function formationCounts(formation) {
+  const [defense, midfield, attack] = formation.substring(2).split("_").map(Number);
+  return { GOALKEEPER: 1, DEFENDER: defense, MIDFIELDER: midfield, FORWARD: attack };
+}

@@ -225,3 +225,50 @@ td.name a:hover { text-decoration: underline; }
   /* On a phone the goals column is dropped; the goal difference is enough. */
   th.goals-column, td.goals-column { display: none; }
 }
+
+/* ---------- Team page ---------- */
+
+.stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.stat { background: var(--line); border-radius: 8px; padding: 8px 12px; min-width: 120px; }
+.stat .label { font-size: 0.8rem; color: var(--muted); }
+.stat .value { font-size: 1.1rem; font-weight: 700; direction: ltr; text-align: right; }
+.stat.warning { background: #fdecea; }
+.stat.warning .value { color: var(--bad); }
+
+/* The pitch: attack at the top, the goalkeeper at the bottom. */
+.pitch {
+  background: repeating-linear-gradient(0deg, #2a7d45 0, #2a7d45 40px, #26743f 40px, #26743f 80px);
+  border-radius: var(--radius);
+  padding: 14px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border: 3px solid #fff;
+}
+
+.pitch-line { display: flex; justify-content: space-around; gap: 6px; }
+
+.shirt {
+  background: #fff;
+  color: var(--text);
+  border-radius: 8px;
+  padding: 4px 6px;
+  font-size: 0.8rem;
+  text-align: center;
+  min-width: 64px;
+  max-width: 110px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.shirt .rating { font-weight: 700; font-size: 0.95rem; }
+.shirt.out-of-position { outline: 2px dashed var(--accent); }
+.shirt.empty { background: rgba(255, 255, 255, 0.35); color: #fff; }
+
+.line-counts { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; font-size: 0.9rem; }
+.line-counts span { padding: 2px 8px; border-radius: 999px; background: var(--line); }
+.line-counts span.wrong { background: #fdecea; color: var(--bad); }
+
+.squad-table select { padding: 4px 6px; width: auto; }
+.rating-cell { font-weight: 700; }
+
+.controls { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
