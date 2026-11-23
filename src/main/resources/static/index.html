@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ליגת חברים</title>
+  <meta name="description" content="משחק מנג'ר כדורגל לליגה פרטית של חברים: בונים הרכב, קונים שחקנים ורואים את המחזור בשידור חי.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header class="top-bar">
+  <a class="logo" href="/">ליגת <span>חברים</span></a>
+  <div class="user-box" id="user-box"></div>
+</header>
+
+<main>
+  <!-- Shown when nobody is logged in. -->
+  <section id="login-section" class="hidden">
+    <div class="card" style="max-width: 420px; margin: 24px auto;">
+      <div class="tabs">
+        <button id="tab-login" type="button">כניסה</button>
+        <button id="tab-register" type="button" class="secondary">הרשמה</button>
+      </div>
+      <form id="login-form">
+        <label for="username">שם משתמש</label>
+        <input id="username" autocomplete="username" required>
+        <label for="password">סיסמה</label>
+        <input id="password" type="password" autocomplete="current-password" required>
+        <label class="check"><input id="remember" type="checkbox" checked> לזכור אותי במחשב הזה</label>
+        <div class="form-actions"><button id="login-button" type="submit">כניסה</button></div>
+        <div id="login-message" class="message hidden"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Shown after logging in. -->
+  <section id="app-section" class="hidden">
+    <div class="card">
+      <h2>הליגות שלי</h2>
+      <ul id="league-list" class="league-list"></ul>
+      <p id="no-leagues" class="muted hidden">עוד אין לך ליגות. פתחו ליגה חדשה, או הצטרפו לליגה של חבר עם הקוד שלה.</p>
+    </div>
+
+    <div class="grid-2">
+      <form id="create-form" class="card">
+        <h2>ליגה חדשה</h2>
+        <label for="league-name">שם הליגה</label>
+        <input id="league-name" maxlength="40" required>
+        <label for="league-size">מספר קבוצות</label>
+        <select id="league-size">
+          <option value="6">6</option>
+          <option value="8" selected>8</option>
+          <option value="10">10</option>
+          <option value="12">12</option>
+        </select>
+        <p class="muted">מקומות שלא יתמלאו בחברים יקבלו קבוצות מחשב.</p>
+        <label for="kickoff-times">שעות המשחקים (שעון ישראל)</label>
+        <input id="kickoff-times" value="21:00" dir="ltr" required>
+        <p class="muted">עד 4 מחזורים ביום, לפחות שעה ביניהם. למשל: 19:00,21:00</p>
+        <label for="create-team">שם הקבוצה שלך</label>
+        <input id="create-team" maxlength="30" required>
+        <div class="form-actions"><button type="submit">פתיחת ליגה</button></div>
+        <div id="create-message" class="message hidden"></div>
+      </form>
+
+      <form id="join-form" class="card">
+        <h2>הצטרפות לליגה</h2>
+        <label for="join-code">קוד הליגה</label>
+        <input id="join-code" maxlength="6" dir="ltr" class="code" required>
+        <label for="join-team">שם הקבוצה שלך</label>
+        <input id="join-team" maxlength="30" required>
+        <div class="form-actions"><button type="submit">הצטרפות</button></div>
+        <div id="join-message" class="message hidden"></div>
+      </form>
+    </div>
+  </section>
+</main>
+
+<script src="/js/api.js"></script>
+<script src="/js/home.js"></script>
+</body>
+</html>
