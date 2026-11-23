@@ -183,7 +183,7 @@ function lineSelect(player) {
 function sellButton(player) {
   const armed = sellArmed === player.id;
   const button = el("button", { className: "small " + (armed ? "danger" : "secondary") },
-    armed ? "למכור ב־" + money(player.sellPrice) + "?" : "מכירה");
+    ...(armed ? ["למכור ב־", el("bdi", null, money(player.sellPrice)), "?"] : ["מכירה"]));
   button.addEventListener("click", async () => {
     if (!armed) {
       sellArmed = player.id;
@@ -196,7 +196,7 @@ function sellButton(player) {
       resetDraft();
       showAll();
       loadMoney();
-      showMessage(document.getElementById("squad-message"), player.name + " נמכר ב־" + money(player.sellPrice), "ok");
+      showMessage(document.getElementById("squad-message"), player.name + " נמכר. הכסף נכנס לקופה.", "ok");
     } catch (e) {
       showSquad();
       showMessage(document.getElementById("squad-message"), e.message, "error");

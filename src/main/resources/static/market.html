@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ליגת חברים – שוק השחקנים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<header class="top-bar">
+  <a class="logo" href="/">ליגת <span>חברים</span></a>
+  <div class="user-box" id="user-box"></div>
+</header>
+
+<main>
+  <div class="card">
+    <div class="page-title">
+      <div>
+        <h1>שוק השחקנים</h1>
+        <div class="muted"><a id="league-link"></a> · <a id="team-link"></a></div>
+      </div>
+    </div>
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <div class="card">
+    <div class="controls">
+      <div>
+        <label for="position-filter">עמדה</label>
+        <select id="position-filter">
+          <option value="">כל העמדות</option>
+        </select>
+      </div>
+      <div>
+        <label for="sort">מיון</label>
+        <select id="sort">
+          <option value="rating">דירוג, מהגבוה</option>
+          <option value="price">מחיר, מהזול</option>
+          <option value="age">גיל, מהצעיר</option>
+        </select>
+      </div>
+    </div>
+    <label class="check"><input id="affordable" type="checkbox"> רק שחקנים שיש לי כסף בשבילם</label>
+
+    <div class="table-scroll">
+      <table>
+        <thead>
+        <tr><th class="name">שחקן</th><th>עמדה</th><th>דירוג</th><th>גיל</th><th>מחיר</th><th>משכורת למחזור</th><th></th></tr>
+        </thead>
+        <tbody id="market-body"></tbody>
+      </table>
+    </div>
+    <p class="muted hidden" id="empty">אין שחקנים שמתאימים לסינון.</p>
+    <div id="market-message" class="message hidden"></div>
+    <p class="muted">שחקן שקונים מצטרף לספסל. כדי שישחק, צריך להכניס אותו להרכב בדף הקבוצה.</p>
+  </div>
+</main>
+
+<script src="/js/api.js"></script>
+<script src="/js/market.js"></script>
+</body>
+</html>
